@@ -53,7 +53,7 @@ Assumes:
 		/** with auth() by Twitter -- where to redirect to on success. Defaults to this page. */
 		redirectOnLogin: window.location,
 
-		ENDPOINT: '/hooru.json',
+		ENDPOINT: 'https://hooru.soda.sh/hooru.json',
 
 		PERMISSIONS: {
 			/** Get an ID to identify who this is, but no more. */
