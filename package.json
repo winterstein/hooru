@@ -1,12 +1,12 @@
 {
   "name": "hooru",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "hooro - proncounced who-are-you is a login and authentication manager. It will handle name/password logins, plus oauth based Twitter/Facebook/etc logins.",
   "main": "hooru.js",
   "dependencies": {
     "jquery": "^3.1.1",
     "js-cookie": "^2.1.3",
-    "sjtest": "^2.1.3"
+    "sjtest": "^0.3.8"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
