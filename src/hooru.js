@@ -8,7 +8,7 @@ Assumes:
 	jquery, SJTest, cookie-js
 
 	Depends on an external web-server (login.soda.sh). 
-
+	Depends on HooruServlet.java
 */
 
 /**
@@ -140,10 +140,18 @@ Assumes:
 			return null;
 		}
 		for(var alias of Login.aliases) {
-			if (alias.service === service) {
+			assert(alias.xid, alias);
+			if (getService(alias.xid) === service) {
 				return alias;
-			}
+			}			
 		}
+		// HACK an xid in the user?
+		if (Login.user && Login.user.xids && Login.user.xids[service]) {
+			return {
+				xid: Login.user.xids[service],
+				xids: Login.user.xids
+				}; // not much we can say about them!
+		} 
 		return null;
 	};
 
@@ -341,6 +349,20 @@ Assumes:
 		return request;
 	};
 
+
+	/**
+	 * TODO Password reset by email
+	 */
+	Login.reset = function(email, brandingParams) {
+		assert(email);
+		const params = brandingParams || {};
+		params.email = email; params.action='reset';
+		var request = aget(Login.ENDPOINT, params);
+		request = request.then(setStateFromServerResponse);
+		return request;
+	};
+
+
 	Login.logout = function() {
 		console.log("logout");
 		var serverResponse = aget(Login.ENDPOINT, {action:'logout'});
@@ -348,7 +370,7 @@ Assumes:
 		return serverResponse;
 	};
 
-	// convenience for ajax with cookies
+	/** convenience for ajax with cookies */
 	var aget = function(url, data) {
 		return $.ajax({
 			url: url,
@@ -377,6 +399,27 @@ Assumes:
 	Login.logoutAndReload = function() {
 		Login.logout();
 		window.location.reload();
+	};
+
+
+	/** TODO merge / equiv / associate /alias: these links are directed, via share.
+	 * 
+	 * Share puppetXId with ownerXId (i.e. ownerXId will have full access to puppetXId).
+	 * 
+	 * Security: The browser must have tokens for both XIds for this request to succeed. 
+	 * So the user must have auth'd as both.
+	 * 
+	 * This should add puppetXId to the XIds of ownerXId.
+	 * @param bothWays {?boolean} If true, this relation is bi-directional: */
+	Login.share = function(puppetXId, ownerXId, bothWays) {
+		var request = aget(Login.ENDPOINT, {
+			'action':'share',
+			'entity': puppetXId,
+			'shareWith': ownerXId,
+			'bothWays': bothWays
+		});
+		request = request.then(setStateFromServerResponse);
+		return request;
 	};
 
 	// Initialise from cookies
