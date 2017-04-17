@@ -1,6 +1,6 @@
 {
   "name": "hooru",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "hooro - proncounced who-are-you is a login and authentication manager. It will handle name/password logins, plus oauth based Twitter/Facebook/etc logins.",
   "main": "./bin/hooru.js",
   "dependencies": {
@@ -22,7 +22,11 @@
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-preset-es2015": "^6.24.1",
-    "babel-register": "^6.24.1"
+    "babel-register": "^6.24.1",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0"
   },
   "scripts": {
 	"test": "mocha test.hooru.js",

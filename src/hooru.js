@@ -198,7 +198,7 @@ Assumes:
 			console.error("#login.state", res.errors[0]);
 			Login.error = res.errors[0];
 			console.log('Login.error set ',res.errors[0]);
-			return;
+			return res;
 		}
 		let newuser = res.cargo && res.cargo.user;
 		// {User[]}
@@ -247,7 +247,7 @@ Assumes:
 		}
 		if ( ! newuser) {
 			logout2();
-			return;
+			return res;
 		}
 		// prefer a non-temp user
 		if (getService(newuser.xid) === 'temp') {
@@ -259,6 +259,7 @@ Assumes:
 			}
 		}
 		setUser(newuser, newaliases);
+		return res;
 	};
 
 	var getService = function(xid) {
