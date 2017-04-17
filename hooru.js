@@ -92,7 +92,9 @@ Assumes:
 	*/
 	Login.getId = function(service) {
 		var u = Login.getUser(service);
-		if ( ! u) return null;
+		if ( ! u) {
+			return null;
+		}
 		return u.xid;
 	};
 
@@ -157,7 +159,6 @@ Assumes:
 
 	// TODO move aliases and user to local-storage 'cos they're chunky json blobs
 	var COOKIE_BASE = "hooru";
-	var COOKIE_USER = COOKIE_BASE+".user";
 	var COOKIE_UXID = "uxid";
 	var COOKIE_WEBTOKEN = COOKIE_BASE+".jwt";
 	const COOKIE_PATH = '/';
@@ -204,7 +205,7 @@ Assumes:
 		let newaliases = res.cargo && res.cargo.aliases && res.cargo.aliases.slice();
 		// check the cookies (which may have changed)
 		let cuxid = Cookies.get(COOKIE_UXID);
-		let cuserjson = Cookies.get(COOKIE_USER);
+		let cuserjson = cuxid? window.localStorage.getItem(cuxid) : null;
 		// string[] XIds
 		let cookieAliases = [];
 		const cookies = Cookies.get();
@@ -298,7 +299,7 @@ Assumes:
 		}
 		Cookies.set(COOKIE_UXID, Login.user.xid, {path: COOKIE_PATH});
 		// webtoken: set by the server
-		Cookies.set(COOKIE_USER, Login.user, {path: COOKIE_PATH});
+		window.localStorage.setItem(Login.user.xid, JSON.stringify(Login.user));
 		if (oldxid != newuser.xid) {
 			Login.change();
 		}
@@ -345,7 +346,7 @@ Assumes:
 	Login.register = function(registerInfo) {
 		registerInfo.action = 'signup';
 		var request = aget(Login.ENDPOINT, registerInfo);
-		request.then(setStateFromServerResponse);
+		request = request.then(setStateFromServerResponse);
 		return request;
 	};
 
