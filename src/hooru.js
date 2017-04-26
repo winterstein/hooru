@@ -43,6 +43,8 @@ Assumes:
 
 
 	var Login = {
+		/** This app, as known by Hooru. You MUST set this! */
+		app: null,
 		/** {User[]} An array of user-info objects. E.g. you might have a Twitter id and an email id.
 		You could even have a couple of email ids. Always includes Login.user. */
 		aliases: null,
@@ -376,6 +378,8 @@ Assumes:
 
 	/** convenience for ajax with cookies */
 	var aget = function(url, data) {
+		assert(Login.app, "You must set Login.app = my-app-name-as-registered-with-Hooru");
+		data.app = Login.app;
 		return $.ajax({
 			url: url,
 			data: data,

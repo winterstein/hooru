@@ -1,6 +1,6 @@
 {
   "name": "hooru",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "hooro - proncounced who-are-you is a login and authentication manager. It will handle name/password logins, plus oauth based Twitter/Facebook/etc logins.",
   "main": "./bin/hooru.js",
   "dependencies": {
