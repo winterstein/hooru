@@ -259,6 +259,8 @@ Assumes:
 			}
 		}
 		setUser(newuser, newaliases);
+		// clear the error
+		Login.error = null;
 		return res;
 	};
 
