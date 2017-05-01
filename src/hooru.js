@@ -54,7 +54,7 @@ Assumes:
 		error: null,
 		/** with auth() by Twitter -- where to redirect to on success. Defaults to this page. */
 		redirectOnLogin: window.location,
-
+		/** The server url. Change this if you use a different login server. */
 		ENDPOINT: 'https://hooru.soda.sh/hooru.json',
 
 		PERMISSIONS: {
@@ -429,6 +429,22 @@ Assumes:
 		request = request.then(setStateFromServerResponse);
 		return request;
 	};
+
+	/**
+	 * Share something related to your app with another user.
+	 * The share comes from the current user.
+	 * @param thingId {String} ID for the thing you want to share. 
+	 * This ID is app specific.
+	 */
+	Login.shareUrl = function(thingId, personXId) {
+		var request = aget(Login.ENDPOINT, {
+			'action':'share',
+			'entity': thingId,
+			'as': Login.getId(),
+			'shareWith': personXId
+		});
+		return request;
+	}
 
 	// Initialise from cookies
 	setStateFromServerResponse({});
