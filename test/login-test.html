@@ -19,6 +19,15 @@
 </head>
 <body>
 
+	
+
+	<a href='login-test-oauth.html'>OAuth Tests</a>
+	<a href='login-status.html'>Your Current Login Status</a>
+
+	<div id='mocha'></div>
+	<script>mocha.setup('bdd')</script>
+  	<script src='login-test.js'></script>
+
 	<div>
 		<h2>Login API</h2>
 		<ul>
@@ -37,14 +46,6 @@
 		</script>
 		</ul>
 	</div>
-
-	<a href='login-test-oauth.html'>OAuth Tests</a>
-	<a href='login-status.html'>Your Current Login Status</a>
-
-	<div id='mocha'></div>
-	<script>mocha.setup('bdd')</script>
-  	<script src='login-test.js'>
-	</script>
 	<script>
 		mocha.checkLeaks();
 		mocha.globals(['jQuery']);

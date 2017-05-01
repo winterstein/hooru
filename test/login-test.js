@@ -52,6 +52,18 @@ describe('Login', function() {
 		});
 	});
 
+	describe('register', function() {
+		it('should work for '+TEST_EMAIL, function(done) {
+			Login.logout().then(function() {
+				var lp = Login.register({email:TEST_EMAIL, password:'1234'});
+				lp.then(function() {
+					assert(Login.user && Login.user.xid, Login);
+					assert(Login.getUser().xid.indexOf(TEST_EMAIL) === 0);
+					done();
+				});
+			});
+		});
+	});
 
 	describe('login', function() {
 		it('should work with name/password', function(done) {
