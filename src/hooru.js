@@ -380,6 +380,8 @@ Assumes:
 	var aget = function(url, data) {
 		assert(Login.app, "You must set Login.app = my-app-name-as-registered-with-Hooru");
 		data.app = Login.app;
+		data.withCredentials = true; // let the server know this is a with-credentials call
+		data.caller = ""+document.location; // provide some extra info
 		return $.ajax({
 			url: url,
 			data: data,
