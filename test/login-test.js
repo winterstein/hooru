@@ -1,7 +1,7 @@
 describe('Login', function() {
 	Login.app = 'test';
 	const TEST_EMAIL = 'test@example.com';
-	Login.ENDPOINT = 'http://local.soda.sh/hooru.json';
+	Login.ENDPOINT = 'http://localhost:8118/hooru.json';
 
 	describe('isLoggedIn', function() {
 		it('should return false when not logged in', function() {
@@ -78,6 +78,18 @@ describe('Login', function() {
 		});
 	});
 
+	describe('login', function() {
+		it('should not work with the wrong password', function(done) {
+			Login.logout().then(function() {
+				var lp = Login.login(TEST_EMAIL,'no-no');
+				lp.always(function() {
+					assert( ! Login.isLoggedIn());
+					assert( ! Login.user);
+					done();
+				});
+			});
+		});
+	});
 
 
 	describe('#getTempId()', function() {
