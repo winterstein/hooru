@@ -55,7 +55,7 @@ Assumes:
 		/** with auth() by Twitter -- where to redirect to on success. Defaults to this page. */
 		redirectOnLogin: window.location,
 		/** The server url. Change this if you use a different login server. */
-		ENDPOINT: 'https://hooru.soda.sh/hooru.json',
+		ENDPOINT: 'https://hooru.winterwell.com/hooru.json',
 
 		PERMISSIONS: {
 			/** Get an ID to identify who this is, but no more. */
@@ -328,7 +328,10 @@ Assumes:
 		logout2();
 		// now try to login
 		var auth = aget(Login.ENDPOINT, {action:'login', person:person, password:password});
-		auth = auth.then(setStateFromServerResponse);
+		auth = auth.then(setStateFromServerResponse)
+				.fail(function(res) {
+					Login.error = {id: res.statusCode, text: res.statusText};	
+				});
 		return auth;
 	};
 
