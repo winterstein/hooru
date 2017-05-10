@@ -90,7 +90,7 @@ Assumes:
 
 	/**
 	@param service {?string} Optional selector
-	@return {string} The (first) xid for this service, or null.
+	@return {string} The (first) xid for this service, or null. E.g. "moses@twitter"
 	*/
 	Login.getId = function(service) {
 		var u = Login.getUser(service);
@@ -415,21 +415,19 @@ Assumes:
 	};
 
 
-	/** TODO merge / equiv / associate /alias: these links are directed, via share.
-	 * 
+	/** 
 	 * Share puppetXId with ownerXId (i.e. ownerXId will have full access to puppetXId).
 	 * 
-	 * Security: The browser must have tokens for both XIds for this request to succeed. 
-	 * So the user must have auth'd as both.
+	 * Security: The browser must have a token for puppetXId for this request to succeed. 
 	 * 
-	 * This should add puppetXId to the XIds of ownerXId.
-	 * @param bothWays {?boolean} If true, this relation is bi-directional: */
-	Login.share = function(puppetXId, ownerXId, bothWays) {
+	 * @param puppetXId {String} Normally Login.getId()
+	 * @param bothWays {?boolean} If true, this relation is bi-directional: you claim the two ids are the same person. */
+	Login.shareLogin = function(puppetXId, personXId, bothWays) {
 		var request = aget(Login.ENDPOINT, {
 			'action':'share',
 			'entity': puppetXId,
-			'shareWith': ownerXId,
-			'bothWays': bothWays
+			'shareWith': personXId,
+			'equiv': bothWays
 		});
 		request = request.then(setStateFromServerResponse);
 		return request;
@@ -441,14 +439,8 @@ Assumes:
 	 * @param thingId {String} ID for the thing you want to share. 
 	 * This ID is app specific.
 	 */
-	Login.shareUrl = function(thingId, personXId) {
-		var request = aget(Login.ENDPOINT, {
-			'action':'share',
-			'entity': thingId,
-			'as': Login.getId(),
-			'shareWith': personXId
-		});
-		return request;
+	Login.shareThing = function(thingId, personXId) {
+		return share(thingId, personXId);
 	}
 
 	// Initialise from cookies

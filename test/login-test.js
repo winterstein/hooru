@@ -92,6 +92,19 @@ describe('Login', function() {
 	});
 
 
+	describe('share', function() {
+		it('should let us link to an email', function(done) {
+			Login.login(TEST_EMAIL,'1234')
+			.then(function() {
+				Login.shareLogin(Login.getId, "test2@example.com@email")
+				.then(function() {
+					done();
+				})				
+			});
+		});
+	});
+
+
 	describe('#getTempId()', function() {
 		it('should provide an id even when logged out', function(done) {
 			if ( ! Login.isLoggedIn()) {
