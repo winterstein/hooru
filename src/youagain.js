@@ -1,5 +1,5 @@
 /**
-hooru.js - Login and authentication (oauth) 
+youagain.js - Login and authentication (oauth) 
 TODO json web tokens
 TODO add associate -- or is that always server side?
 TODO add browser tracking codes
@@ -8,7 +8,7 @@ Assumes:
 	jquery, SJTest, cookie-js
 
 	Depends on an external web-server (login.soda.sh). 
-	Depends on HooruServlet.java
+	Depends on you-againServlet.java
 */
 
 /**
@@ -43,7 +43,7 @@ Assumes:
 
 
 	var Login = {
-		/** This app, as known by Hooru. You MUST set this! */
+		/** This app, as known by you-again. You MUST set this! */
 		app: null,
 		/** {User[]} An array of user-info objects. E.g. you might have a Twitter id and an email id.
 		You could even have a couple of email ids. Always includes Login.user. */
@@ -55,7 +55,7 @@ Assumes:
 		/** with auth() by Twitter -- where to redirect to on success. Defaults to this page. */
 		redirectOnLogin: window.location,
 		/** The server url. Change this if you use a different login server. */
-		ENDPOINT: 'https://hooru.winterwell.com/hooru.json',
+		ENDPOINT: 'https://youagain.winterwell.com/youagain.json',
 
 		PERMISSIONS: {
 			/** Get an ID to identify who this is, but no more. */
@@ -160,7 +160,7 @@ Assumes:
 	};
 
 	// TODO move aliases and user to local-storage 'cos they're chunky json blobs
-	var COOKIE_BASE = "hooru";
+	var COOKIE_BASE = "you-again";
 	var COOKIE_UXID = "uxid";
 	var COOKIE_WEBTOKEN = COOKIE_BASE+".jwt";
 	const COOKIE_PATH = '/';
@@ -381,7 +381,7 @@ Assumes:
 
 	/** convenience for ajax with cookies */
 	var aget = function(url, data) {
-		assert(Login.app, "You must set Login.app = my-app-name-as-registered-with-Hooru");
+		assert(Login.app, "You must set Login.app = my-app-name-as-registered-with-you-again");
 		data.app = Login.app;
 		data.withCredentials = true; // let the server know this is a with-credentials call
 		data.caller = ""+document.location; // provide some extra info
