@@ -360,14 +360,15 @@ Assumes:
 
 
 	/**
-	 * TODO Password reset by email
+	 * Password reset by email
 	 */
-	Login.reset = function(email, brandingParams) {
+	Login.reset = function(email) {
 		assert(email);
-		const params = brandingParams || {};
-		params.email = email; params.action='reset';
+		const params = {
+			email: email,
+			action: 'reset'
+		}
 		var request = aget(Login.ENDPOINT, params);
-		request = request.then(setStateFromServerResponse);
 		return request;
 	};
 
