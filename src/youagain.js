@@ -444,13 +444,27 @@ Assumes:
 		return Login.shareLogin(thingId, personXId);
 	}
 
+	/**
+	 * Claim ownership of a thing, which allows you to share it. 
+	 * First-come first-served: If it has already been claimed by someone else then this will fail.
+	 * @param thingId {String} ID for the thing you want to share. 
+	 * This ID is app specific. E.g. "/myfolder/mything"
+	 */
+	Login.claim = function(thingId) {
+		var request = aget(Login.ENDPOINT, {
+			'action':'claim',
+			'entity': thingId
+		});
+		return request;
+	};
+
 	Login.getSharedWith = function() {
 		var request = aget(Login.ENDPOINT, {
 			'action':'shared-with'
 		});
 		return request;
-	}
-	
+	}	
+
 	Login.getSharedBy = function() {
 		var request = aget(Login.ENDPOINT, {
 			'action':'shared-by'
