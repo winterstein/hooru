@@ -437,12 +437,26 @@ Assumes:
 	 * Share something related to your app with another user.
 	 * The share comes from the current user.
 	 * @param thingId {String} ID for the thing you want to share. 
-	 * This ID is app specific.
+	 * This ID is app specific. E.g. "/myfolder/mything"
 	 */
 	Login.shareThing = function(thingId, personXId) {
-		return share(thingId, personXId);
+		// actually they are the same call, but bothWays only applies for shareLogin
+		return Login.shareLogin(thingId, personXId);
 	}
 
+	Login.getSharedWith = function() {
+		var request = aget(Login.ENDPOINT, {
+			'action':'shared-with'
+		});
+		return request;
+	}
+	
+	Login.getSharedBy = function() {
+		var request = aget(Login.ENDPOINT, {
+			'action':'shared-by'
+		});
+		return request;
+	}
 	// Initialise from cookies
 	setStateFromServerResponse({});
 

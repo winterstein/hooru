@@ -102,6 +102,45 @@ describe('Login', function() {
 				})				
 			});
 		});
+		it('should let us share a file ref', function(done) {
+			Login.login(TEST_EMAIL,'1234')
+			.then(function() {
+				Login.shareThing("/"+Login.getId()+"/myfile/myfolder", "test2@example.com@email")
+				.then(function(res) {
+					console.log("Shared", res);
+					done();
+				})				
+			});
+		});
+	});
+
+
+	describe('shared-with', function() {
+		it('should show shared-with', function(done) {
+			Login.login(TEST_EMAIL,'1234')
+			.then(function() {
+				Login.getSharedWith()
+				.then(function(res) {
+					let shares = res.cargo;
+					console.log("shared-with", shares);
+					assert(shares);
+					done();
+				})				
+			});
+		});
+		it('should show shared-by', function(done) {
+			Login.login(TEST_EMAIL,'1234')
+			.then(function() {
+				Login.getSharedBy()
+				.then(function(res) {
+					let shares = res.cargo;
+					console.log("shared-by", shares);
+					assert(shares && shares.length);
+					assert(shares[0].by === TEST_EMAIL+"@test", shares[0].by);
+					done();
+				})				
+			});
+		});
 	});
 
 
