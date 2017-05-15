@@ -199,7 +199,6 @@ Assumes:
 			// stash the error for showing to the user
 			console.error("#login.state", res.errors[0]);
 			Login.error = res.errors[0];
-			console.log('Login.error set ',res.errors[0]);
 			return res;
 		}
 		let newuser = res.cargo && res.cargo.user;
@@ -368,9 +367,36 @@ Assumes:
 			email: email,
 			action: 'reset'
 		}
+		var request = aget(Login.ENDPOINT, params)
+			.then(function(res) {
+				if (res.errors && res.errors.length) {
+					// stash the error for showing to the user
+					console.error("#login.state", res.errors[0]);
+					Login.error = res.errors[0];
+					return res;
+				}
+				return res;
+			});
+		return request;
+	};
+
+	/**
+	 * Change password.
+	 * 
+	 * Note: This is a "higher security" action, and auth tokens aren't considered enough for this.
+	 */
+	Login.setPassword = function(email, currentPassword, newPassword) {
+		assert(email && currentPassword && newPassword);
+		const params = {
+			email: email,
+			action: 'set-password',
+			auth: currentPassword,
+			newPassword: newPassword
+		}
 		var request = aget(Login.ENDPOINT, params);
 		return request;
 	};
+
 
 
 	Login.logout = function() {
