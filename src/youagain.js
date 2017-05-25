@@ -475,29 +475,42 @@ Assumes:
 	 * Claim ownership of a thing, which allows you to share it. 
 	 * First-come first-served: If it has already been claimed by someone else then this will fail.
 	 * @param thingId {String} ID for the thing you want to share. 
-	 * This ID is app specific. E.g. "/myfolder/mything"
+	 * This ID is app specific (i.e. app1 and app2 use different namespaces). E.g. "/myfolder/mything"
 	 */
 	Login.claim = function(thingId) {
 		var request = aget(Login.ENDPOINT, {
-			'action':'claim',
-			'entity': thingId
+			action: 'claim',
+			entity: thingId
 		});
 		return request;
 	};
 
 	Login.getSharedWith = function() {
 		var request = aget(Login.ENDPOINT, {
-			'action':'shared-with'
+			action:'shared-with'
 		});
 		return request;
 	}	
 
 	Login.getSharedBy = function() {
 		var request = aget(Login.ENDPOINT, {
-			'action':'shared-by'
+			action:'shared-by'
 		});
 		return request;
 	}
+
+	/**
+	 * Check whether the user can access this thing. 
+	 * Returns a share object if there is one, otherwise returns without error but with success:false 
+	 */
+	Login.checkShare = function(thingId) {
+		var request = aget(Login.ENDPOINT, {
+			action: 'check-share',
+			entity: thingId
+		});
+		return request;
+	}
+
 	// Initialise from cookies
 	setStateFromServerResponse({});
 
