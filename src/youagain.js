@@ -274,6 +274,7 @@ Assumes:
 
 
 	/**
+	 * This is normally for internal use.
 	 * @param {User} newuser
 	 * @param {?User[]} newaliases 
 	 */
@@ -307,7 +308,9 @@ Assumes:
 		if (oldxid != newuser.xid) {
 			Login.change();
 		}
-	};
+	}; // ./setUser
+	// expose this for advanced external use!
+	Login.setUser = setUser;
 
 	Login.loginForm = function(el) {
 		var $form = $(el).closest('form');
