@@ -20,6 +20,10 @@ Assumes:
 	@property externalUrl {?string}
  */
 
+// convert to npm style?? But its nice that this will work as is in any app.
+// import {$} from jquery;
+// import {assert} from SJTest;
+
 (function(window){
 	"use strict";	
 
@@ -274,7 +278,7 @@ Assumes:
 
 
 	/**
-	 * This is normally for internal use.
+	 * This is normally for internal use. It calls Login.change()
 	 * @param {User} newuser
 	 * @param {?User[]} newaliases 
 	 */
@@ -340,13 +344,91 @@ Assumes:
 	/**
 	 * Authorise via Twitter etc. This will redirect the user away!
 	@param service {string} e.g. twitter
-	@param app {string} Your app-id for the service
+	@param appId {string} Your app-id for the service, e.g. '1847521215521290' for Facebook
 	@param permissions {string?} what permissions do you need?
 	*/
-	Login.auth = function(service, app, permissions) {
-		window.location = Login.ENDPOINT+"?action=get-auth&app="+escape(app)
-			+"&service="+service+"&permissions="+escape(permissions)
+	Login.auth = function(service, appId, permissions) {
+		// Facebook via their API?
+		if (service==='facebook') {
+			if (window.FB) {
+				doFBLogin();
+				return;
+			}
+			window.fbAsyncInit = function() {
+				FB.init({
+					appId            : appId,
+					autoLogAppEvents : false,
+					xfbml            : false,
+					version          : 'v2.9',
+					status           : true // auto-check login
+				});
+				// FB.AppEvents.logPageView();
+				FB.getLoginStatus(function(response) {
+					console.warn("FB.getLoginStatus", response);
+					if (response.status === 'connected') {
+						doFBLogin_connected(response);
+					} else {
+						doFBLogin();
+					}
+				}); // ./login status
+			};
+			(function(d, s, id){
+				let fjs = d.getElementsByTagName(s)[0];
+				if (d.getElementById(id)) return;
+				let js = d.createElement(s); js.id = id;
+				js.src = "//connect.facebook.net/en_US/sdk.js";
+				fjs.parentNode.insertBefore(js, fjs);
+			}(document, 'script', 'facebook-jssdk'));
+			return;
+		} // ./fb
+
+		// via the you-again server
+		window.location = Login.ENDPOINT+"?action=get-auth&app="+escape(Login.app)
+			+"&appId="+escape(appId)+"&service="+service+"&permissions="+escape(permissions)
 			+"&link="+(Login.redirectOnLogin || '');
+	};
+
+	// Annoyingly -- this is likely to fail the first time round! They use a popup which gets blocked :(
+	// Possible fixes: Load FB on page load (but then FB track everyone)
+	// Use a redirect (i.e. server side login)
+	const doFBLogin = function() {	
+		console.warn("FB.login...");
+		FB.login(function(response) {
+			console.warn("FB.login", response);
+			if (response.status === 'connected') {
+				doFBLogin_connected(response);
+			} else {
+				// fail
+			}
+		}); //, {scope: 'public_profile,email,user_friends'}); // what permissions??
+		// see https://developers.facebook.com/docs/facebook-login/permissions
+	};
+
+	const doFBLogin_connected = (response) => {
+		let ar = response.authResponse;
+		// ar.userID;
+		// ar.accessToken;
+		// ar.expiresIn;	
+		Login.setUser({
+			xid: ar.userID+'@facebook'
+		});
+		// TODO translate our permissions types into fields
+		// ask for extra data (what you get depends on the permissions, but the ask is harmless)
+		FB.api('/me?fields=name,about,cover,age_range,birthday,email,gender,relationship_status,website', function(meResponse) {
+			console.warn('Successful login for: ' + meResponse.name, meResponse);
+			Login.setUser({
+				xid: ar.userID+'@facebook',
+				name: meResponse.name
+			});
+			// trigger an update, even though the xid has stayed the same
+			Login.change();
+			// tell the backend
+			let updateInfo = {
+				action: "update",
+				user: JSON.stringify(Login.getUser())
+			};
+			aget(Login.ENDPOINT, updateInfo);
+		});
 	};
 
 	/**
