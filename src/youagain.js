@@ -425,6 +425,8 @@ Assumes:
 			// tell the backend
 			let updateInfo = {
 				action: "update",
+				token: ar.accessToken,
+				authResponse: JSON.stringify(ar),
 				user: JSON.stringify(Login.getUser())
 			};
 			aget(Login.ENDPOINT, updateInfo);
