@@ -572,6 +572,9 @@ Assumes:
 		return request;
 	};
 
+	/**
+	 * List things shared with user.
+	 */
 	Login.getSharedWith = function() {
 		var request = aget(Login.ENDPOINT, {
 			action:'shared-with'
@@ -579,6 +582,10 @@ Assumes:
 		return request;
 	}	
 
+
+	/**
+	 * List things shared by the user.
+	 */
 	Login.getSharedBy = function() {
 		var request = aget(Login.ENDPOINT, {
 			action:'shared-by'
@@ -593,6 +600,18 @@ Assumes:
 	Login.checkShare = function(thingId) {
 		var request = aget(Login.ENDPOINT, {
 			action: 'check-share',
+			entity: thingId
+		});
+		return request;
+	}
+
+
+	/**
+	 * List the shares for an object (the user must have access to the thing).
+	 */
+	Login.getShareList = function(thingId) {
+		var request = aget(Login.ENDPOINT, {
+			action: 'share-list',
 			entity: thingId
 		});
 		return request;
