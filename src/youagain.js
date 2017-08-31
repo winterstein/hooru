@@ -351,6 +351,7 @@ Assumes:
 	Login.auth = function(service, appId, permissions) {
 		// Facebook via their API?
 		if (service==='facebook') {
+			assert(appId, "Please provide a FB app id");
 			if (window.FB) {
 				return doFBLogin();
 			}
