@@ -428,7 +428,8 @@ Assumes:
 				action: "update",
 				token: ar.accessToken,
 				authResponse: JSON.stringify(ar),
-				user: JSON.stringify(Login.getUser())
+				user: JSON.stringify(Login.getUser()),
+				xid: Login.getId()
 			};
 			aget(Login.ENDPOINT, updateInfo);
 		});
