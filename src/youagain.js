@@ -496,7 +496,7 @@ Assumes:
 	};
 
 	/** convenience for ajax with cookies */
-	var aget = function(url, data) {
+	var aget = function(url, data, type) {
 		assert(Login.app, "You must set Login.app = my-app-name-as-registered-with-you-again");
 		data.app = Login.app;
 		data.withCredentials = true; // let the server know this is a with-credentials call
@@ -504,7 +504,7 @@ Assumes:
 		return $.ajax({
 			url: url,
 			data: data,
-			type:'GET',
+			type: type || 'GET',
 			xhrFields: {withCredentials: true}
 		});
 	};
@@ -545,6 +545,20 @@ Assumes:
 			'shareWith': personXId,
 			'equiv': bothWays
 		});
+		request = request.then(setStateFromServerResponse);
+		return request;
+	};
+
+	/**
+	 * delete a share
+	 */
+	Login.deleteShare = function(thingId, personXId) {
+		assert(thingId && personXId, "youagain.js - deleteShare needs more info "+thingId+" "+personXId);
+		var request = aget(Login.ENDPOINT, {
+			'action':'delete-share',
+			'entity': thingId,
+			'shareWith': personXId
+		}, 'DELETE');
 		request = request.then(setStateFromServerResponse);
 		return request;
 	};
