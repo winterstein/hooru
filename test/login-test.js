@@ -1,7 +1,7 @@
 describe('Login', function() {
 	Login.app = 'test';
 	const TEST_EMAIL = 'test@example.com';
-	Login.ENDPOINT = 'http://localhost:8118/youagain.json';
+	// Login.ENDPOINT = 'http://localhost:8118/youagain.json';
 
 	describe('isLoggedIn', function() {
 		it('should return false when not logged in', function() {
