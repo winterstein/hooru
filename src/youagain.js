@@ -243,8 +243,10 @@ Assumes:
 		if (cuxid && ! newuser) newuser = {xid:cuxid};
 		if ( ! newaliases) newaliases = [];
 		for(let cxid of cookieAliases) {
-			assert(getService(cxid), cxid);	
-			if (_.find(newaliases, {xid:cxid})) continue;
+			assert(getService(cxid), cxid);				
+			var skip;
+			newaliases.forEach(na => {if (na.xid === cxid) skip = true;} );
+			if (skip) continue;
 			newaliases.push({xid:cxid});					
 		}
 		if (newaliases.length && ! newuser) {
