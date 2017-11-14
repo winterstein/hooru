@@ -163,6 +163,24 @@ Assumes:
 		return null;
 	};
 
+	/**
+	 * An email address for the current user.
+	 * This is NOT necc a verified email - use it at your own risk.
+	 * For a more cautious approach, use `Login.getUser('email')`
+	 */
+	Login.getEmail = function() {		
+		let emailXId = Login.getId('email');
+		if (emailXId) {
+			let i = emailXId.lastIndexOf('@');
+			return emailXId.substr(0, i);
+		}
+		// stab in the dark -- does the user have an email property?
+		// This also provides a handy place where email can be stored on non-email (inc temp) users.
+		let user = Login.getUser();
+		let e = user && user.email;
+		return e;
+	};
+
 	// TODO move aliases and user to local-storage 'cos they're chunky json blobs
 	var COOKIE_BASE = "you-again";
 	var COOKIE_UXID = "uxid";
