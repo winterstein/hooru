@@ -1,12 +1,12 @@
 {
   "name": "you-again",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "You-Again Login and Authentication Manager. It will handle name/password logins, plus oauth based Twitter/Facebook/etc logins.",
   "main": "./bin/youagain.js",
   "dependencies": {
     "jquery": "^3.1.1",
-    "js-cookie": "^2.1.4",
-    "sjtest": "^0.4.3"
+    "js-cookie": "^2.2.0",
+    "sjtest": "^0.4.6"
   },
   "keywords": [
     "login",

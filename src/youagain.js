@@ -550,6 +550,35 @@ Assumes:
 		window.location.reload();
 	};
 
+	/**
+	 * "sign" a packet by adding jwt token(s)
+	 * @param {Object|FormData} ajaxParams. A params object, intended for jQuery $.ajax.
+	 * @returns the input object
+	 */
+	Login.sign = function(ajaxParams) {		
+		assert(ajaxParams && ajaxParams.data, 'youagain.js - sign: no ajaxParams.data', ajaxParams);
+		if ( ! Login.isLoggedIn()) return ajaxParams;
+		dataPut(ajaxParams.data, 'as', Login.getId());
+		dataPut(ajaxParams.data, 'jwt', Login.getUser().jwt);
+		ajaxParams.xhrFields = {withCredentials: true}; // send cookies
+		dataPut(ajaxParams.data, 'withCredentials', true); // let the server know this is a with-credentials call
+		return ajaxParams;
+	};
+
+	/**
+	 * Utility to set a key=value pair for FormData or a normal data map.
+	 * @param {FormData|Object} formData 
+	 * @param {String} key 
+	 * @param {*} value 
+	 */
+	const dataPut = function(formData, key, value) {
+		// HACK: is it a FormData object? then use append
+		if (typeof(formData.append)==='function') {
+			formData.append(key, value);
+		} else {
+			formData[key] = value;
+		}
+	};
 
 	/** 
 	 * Share puppetXId with ownerXId (i.e. ownerXId will have full access to puppetXId).
