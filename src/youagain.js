@@ -558,6 +558,7 @@ Assumes:
 	Login.sign = function(ajaxParams) {		
 		assert(ajaxParams && ajaxParams.data, 'youagain.js - sign: no ajaxParams.data', ajaxParams);
 		if ( ! Login.isLoggedIn()) return ajaxParams;
+		dataPut(ajaxParams.data, 'app', Login.app);
 		dataPut(ajaxParams.data, 'as', Login.getId());
 		dataPut(ajaxParams.data, 'jwt', Login.getUser().jwt);
 		ajaxParams.xhrFields = {withCredentials: true}; // send cookies
@@ -566,7 +567,7 @@ Assumes:
 	};
 
 	/**
-	 * Utility to set a key=value pair for FormData or a normal data map.
+	 * Utility to set a key=value pair for FormData (a browser native object) or a normal data map.
 	 * @param {FormData|Object} formData 
 	 * @param {String} key 
 	 * @param {*} value 
@@ -685,4 +686,4 @@ Assumes:
 	// Initialise from cookies
 	setStateFromServerResponse({});
 
-}(window));
+}(typeof(window)==='undefined'? global : window));

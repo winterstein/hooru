@@ -1,7 +1,14 @@
+
+// can't get this to work :(
+// ReferenceError: assert is not defined
+// require('../src/youagain.js');
+// require('sjtest');
+
 describe('Login', function() {
 	Login.app = 'test';
 	const TEST_EMAIL = 'test@example.com';
 	// Login.ENDPOINT = 'http://localhost:8118/youagain.json';
+	this.timeout(20000);
 
 	describe('isLoggedIn', function() {
 		it('should return false when not logged in', function() {
@@ -26,12 +33,26 @@ describe('Login', function() {
 		});
 	});
 
+	describe('#sign()', function() {
+		it('should sign params', function(done) {
+			var lp = Login.login(TEST_EMAIL,'1234');
+			lp.then(function() {
+				let params = {url:'https://youagain.winterwell.com/youagain.json', data:{action:'verify', app:Login.app}};
+				Login.sign(params);
+				$.ajax(params)
+				.then(res => {
+					assert(res.success, res);
+					done();
+				})				
+			});
+		});
+	});
 
 	describe('#reset()', function() {
 		it('should pass a smoketest', function(done) {
 			const preset = Login.reset(TEST_EMAIL);
 			preset.then(function(r) {
-				console.log("reset", r);
+				assert(r.success, r);
 				done();
 			});
 		});
