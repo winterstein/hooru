@@ -589,6 +589,8 @@ Assumes:
 	 * @param puppetXId {String} Normally Login.getId()
 	 * @param bothWays {?boolean} If true, this relation is bi-directional: you claim the two ids are the same person. */
 	Login.shareLogin = function(puppetXId, personXId, bothWays) {
+		assert(isString(puppetXId), 'youagain.js shareThing() - Not a String ', puppetXId);
+		assert(isString(personXId), 'youagain.js shareThing() - Not an XId String ', personXId);
 		var request = aget(Login.ENDPOINT, {
 			'action':'share',
 			'entity': puppetXId,
@@ -631,6 +633,7 @@ Assumes:
 	 * This ID is app specific (i.e. app1 and app2 use different namespaces). E.g. "/myfolder/mything"
 	 */
 	Login.claim = function(thingId) {
+		assert(isString(thingId), 'youagain.js claim() - Not a String ',thingId);
 		var request = aget(Login.ENDPOINT, {
 			action: 'claim',
 			entity: thingId
@@ -640,6 +643,7 @@ Assumes:
 
 	/**
 	 * List things shared with user.
+	 * You are advised to cache this!
 	 */
 	Login.getSharedWith = function() {
 		var request = aget(Login.ENDPOINT, {
@@ -651,6 +655,7 @@ Assumes:
 
 	/**
 	 * List things shared by the user.
+	 * You are advised to cache this!
 	 */
 	Login.getSharedBy = function() {
 		var request = aget(Login.ENDPOINT, {
@@ -659,11 +664,15 @@ Assumes:
 		return request;
 	}
 
+	const isString = x => typeof(x)==='String';
+
 	/**
 	 * Check whether the user can access this thing. 
 	 * Returns a share object if there is one, otherwise returns without error but with success:false 
+	 * You are advised to cache this!
 	 */
 	Login.checkShare = function(thingId) {
+		assert(isString(thingId), 'youagain.js checkShare() - Not a String ',thingId);
 		var request = aget(Login.ENDPOINT, {
 			action: 'check-share',
 			entity: thingId
@@ -674,8 +683,10 @@ Assumes:
 
 	/**
 	 * List the shares for an object (the user must have access to the thing).
+	 * You are advised to cache this!
 	 */
 	Login.getShareList = function(thingId) {
+		assert(isString(thingId), 'youagain.js getShareList() - Not a String ',thingId);
 		var request = aget(Login.ENDPOINT, {
 			action: 'share-list',
 			entity: thingId
