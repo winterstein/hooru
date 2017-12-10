@@ -451,9 +451,12 @@ Assumes:
 				user: JSON.stringify(Login.getUser()),
 				xid: Login.getId()
 			};
-			aget(Login.ENDPOINT, updateInfo);
+			aget(Login.ENDPOINT, updateInfo)
+			.then(	// JWT from YA has to be stored
+				setStateFromServerResponse
+			);
 		});
-	};
+	}; // ./doFBLogin_connected()
 
 	/**
 	* Register a new user, typically with email & password
