@@ -667,7 +667,7 @@ Assumes:
 		return request;
 	}
 
-	const isString = x => typeof(x)==='String';
+	const isString = x => typeof(x)==='string';
 
 	/**
 	 * Check whether the user can access this thing. 
