@@ -365,7 +365,7 @@ Assumes:
 	 * Authorise via Twitter etc. This will redirect the user away!
 	@param service {string} e.g. twitter
 	@param appId {string} Your app-id for the service, e.g. '1847521215521290' for Facebook
-	@param permissions {string?} what permissions do you need?
+	@param permissions {string?} what permissions do you need? See Login.PERMISSIONS
 	@returns Nothing! TODO a future would be nice
 	*/
 	Login.auth = function(service, appId, permissions) {
@@ -405,7 +405,8 @@ Assumes:
 
 		// via the you-again server
 		window.location = Login.ENDPOINT+"?action=get-auth&app="+escape(Login.app)
-			+"&appId="+escape(appId)+"&service="+service+"&permissions="+escape(permissions)
+			+"&appId="+escape(appId)+"&service="+service
+			+(permissions? "&permissions="+escape(permissions) : '')
 			+"&link="+(Login.redirectOnLogin || '');
 	};
 
