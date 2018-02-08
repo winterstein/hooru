@@ -4,7 +4,8 @@
   "description": "You-Again Login and Authentication Manager. It will handle name/password logins, plus oauth based Twitter/Facebook/etc logins.",
   "main": "./bin/youagain.js",
   "dependencies": {
-    "jquery": "^3.1.1",
+    "eslint-plugin-import": "^2.8.0",
+    "jquery": "^3.3.1",
     "js-cookie": "^2.2.0",
     "sjtest": "^0.4.6"
   },
