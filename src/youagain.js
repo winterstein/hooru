@@ -629,10 +629,11 @@ Assumes:
 	 * The share comes from the current user.
 	 * @param thingId {String} ID for the thing you want to share. 
 	 * This ID is app specific. E.g. "/myfolder/mything"
+	 * @param message {?String} Optional message to email to personXId
 	 */
-	Login.shareThing = function(thingId, personXId) {
+	Login.shareThing = function(thingId, personXId, message) {
 		// actually they are the same call, but bothWays only applies for shareLogin
-		return Login.shareLogin(thingId, personXId);
+		return Login.shareLogin(thingId, personXId, null, message);
 	}
 
 	/**
