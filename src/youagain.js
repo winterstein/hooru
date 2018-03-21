@@ -590,16 +590,21 @@ Assumes:
 	 * 
 	 * Security: The browser must have a token for puppetXId for this request to succeed. 
 	 * 
-	 * @param puppetXId {String} Normally Login.getId()
-	 * @param bothWays {?boolean} If true, this relation is bi-directional: you claim the two ids are the same person. */
-	Login.shareLogin = function(puppetXId, personXId, bothWays) {
+	 * @param puppetXId {String} Normally Login.getId() But actually this can be any string! This is the base method for shareThing()
+	 * TODO we should probably refactor that just for clearer naming.
+	 * @param personXId {String} the user who it is shared with
+	 * @param bothWays {?boolean} If true, this relation is bi-directional: you claim the two ids are the same person.
+	 * @param message {?String} Optional message to email to personXId
+	 */
+	Login.shareLogin = function(puppetXId, personXId, bothWays, message) {
 		assert(isString(puppetXId), 'youagain.js shareThing() - Not a String ', puppetXId);
 		assert(isString(personXId), 'youagain.js shareThing() - Not an XId String ', personXId);
 		var request = aget(Login.ENDPOINT, {
 			'action':'share',
 			'entity': puppetXId,
 			'shareWith': personXId,
-			'equiv': bothWays
+			'equiv': bothWays,
+			'message': message 
 		});
 		request = request.then(setStateFromServerResponse);
 		return request;
@@ -614,7 +619,7 @@ Assumes:
 			'action':'delete-share',
 			'entity': thingId,
 			'shareWith': personXId
-		}, 'DELETE');
+		}); // NB: jQuery turns delete into options, no idea why, which upsets the server, 'DELETE');
 		request = request.then(setStateFromServerResponse);
 		return request;
 	};
