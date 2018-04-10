@@ -59,7 +59,7 @@ Assumes:
 		/** with auth() by Twitter -- where to redirect to on success. Defaults to this page. */
 		redirectOnLogin: window.location,
 		/** The server url. Change this if you use a different login server. */
-		ENDPOINT: 'https://youagain.winterwell.com/youagain.json',
+		ENDPOINT: 'https://youagain.good-loop.com/youagain.json',
 
 		PERMISSIONS: {
 			/** Get an ID to identify who this is, but no more. */
