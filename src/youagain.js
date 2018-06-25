@@ -228,7 +228,6 @@ Assumes:
 		let newaliases = res.cargo && res.cargo.aliases && res.cargo.aliases.slice();
 		// check the cookies (which may have changed)
 		let cuxid = Cookies.get(COOKIE_UXID);
-		let cuserjson = cuxid? window.localStorage.getItem(cuxid) : null;
 		// string[] XIds
 		let cookieAliases = [];
 		const cookies = Cookies.get();
@@ -249,14 +248,15 @@ Assumes:
 				}
 			}
 		}
-		if (cuserjson) {
-			try {
-				var cuser = JSON.parse(cuserjson);
-				if ( ! newuser) newuser = cuser;
-			} catch(error) {
-				console.error("login", error);
-			}
-		}
+		// let cuserjson = cuxid? window.localStorage.getItem(cuxid) : null;
+		// if (cuserjson) {
+		// 	try {
+		// 		var cuser = JSON.parse(cuserjson);
+		// 		if ( ! newuser) newuser = cuser;
+		// 	} catch(error) {
+		// 		console.error("login", error);
+		// 	}
+		// }
 		console.log("login coookies", cookieAliases, cuser);
 		if (cuxid && ! newuser) newuser = {xid:cuxid};
 		if ( ! newaliases) newaliases = [];
@@ -328,7 +328,7 @@ Assumes:
 		}
 		Cookies.set(COOKIE_UXID, Login.user.xid, {path: COOKIE_PATH});
 		// webtoken: set by the server
-		window.localStorage.setItem(Login.user.xid, JSON.stringify(Login.user));
+		// window.localStorage.setItem(Login.user.xid, JSON.stringify(Login.user));
 		if (oldxid != newuser.xid) {
 			Login.change();
 		}
@@ -543,11 +543,11 @@ Assumes:
 			}
 		}
 		Cookies.remove(COOKIE_UXID, {path: COOKIE_PATH});
-		// local storage		
-		var uxid = Login.getId();
-		if (uxid) {
-			window.localStorage.removeItem(uxid);
-		}
+		// // local storage		
+		// var uxid = Login.getId();
+		// if (uxid) {
+		// 	window.localStorage.removeItem(uxid);
+		// }
 		// local vars
 		Login.user = null;
 		Login.aliases = null;
