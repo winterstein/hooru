@@ -543,9 +543,16 @@ Assumes:
 			}
 		}
 		Cookies.remove(COOKIE_UXID, {path: COOKIE_PATH});
+		// local storage		
+		var uxid = Login.getId();
+		if (uxid) {
+			window.localStorage.removeItem(uxid);
+		}
+		// local vars
 		Login.user = null;
 		Login.aliases = null;
-		Login.error = null;
+		Login.error = null;		
+		// notify any listeners
 		Login.change();
 	};
 
