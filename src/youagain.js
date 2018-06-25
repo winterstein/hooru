@@ -257,7 +257,7 @@ Assumes:
 		// 		console.error("login", error);
 		// 	}
 		// }
-		console.log("login coookies", cookieAliases, cuser);
+		console.log("login coookies", cookieAliases);
 		if (cuxid && ! newuser) newuser = {xid:cuxid};
 		if ( ! newaliases) newaliases = [];
 		for(let cxid of cookieAliases) {
