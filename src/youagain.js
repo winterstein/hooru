@@ -375,31 +375,8 @@ Assumes:
 			if (window.FB) {
 				return doFBLogin();
 			}
-			window.fbAsyncInit = function() {
-				FB.init({
-					appId            : appId,
-					autoLogAppEvents : false,
-					xfbml            : false,
-					version          : 'v2.9',
-					status           : true // auto-check login
-				});
-				// FB.AppEvents.logPageView();
-				FB.getLoginStatus(function(response) {
-					console.warn("FB.getLoginStatus", response);
-					if (response.status === 'connected') {
-						doFBLogin_connected(response);
-					} else {
-						doFBLogin();
-					}
-				}); // ./login status
-			};
-			(function(d, s, id){
-				let fjs = d.getElementsByTagName(s)[0];
-				if (d.getElementById(id)) return;
-				let js = d.createElement(s); js.id = id;
-				js.src = "//connect.facebook.net/en_US/sdk.js";
-				fjs.parentNode.insertBefore(js, fjs);
-			}(document, 'script', 'facebook-jssdk'));
+			Login.onFB_doLogin = true;
+			Login.prepFB();
 			return;
 		} // ./fb
 
@@ -409,6 +386,41 @@ Assumes:
 			+(permissions? "&permissions="+escape(permissions) : '')
 			+"&link="+(Login.redirectOnLogin || '');
 	};
+
+	/** load the FB code - done lazy for privacy and speed */
+	Login.prepFB = function() {
+		if (window.FB) return;
+		if (Login.preppingFB) return;
+		Login.preppingFB = true;
+		window.fbAsyncInit = function() {
+			FB.init({
+				appId            : appId,
+				autoLogAppEvents : false,
+				xfbml            : false,
+				version          : 'v2.9',
+				status           : true // auto-check login
+			});
+			// FB.AppEvents.logPageView();
+			FB.getLoginStatus(function(response) {
+				console.warn("FB.getLoginStatus", response);
+				if (response.status === 'connected') {
+					doFBLogin_connected(response);
+				} else {
+					if (Login.onFB_doLogin) {
+						doFBLogin();
+					}
+				}
+			}); // ./login status
+		};
+		(function(d, s, id){
+			let fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) return;
+			let js = d.createElement(s); js.id = id;
+			js.src = "//connect.facebook.net/en_US/sdk.js";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));
+	}; // ./prepFB
+
 
 	// Annoyingly -- this is likely to fail the first time round! They use a popup which gets blocked :(
 	// Possible fixes: Load FB on page load (but then FB track everyone)
