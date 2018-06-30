@@ -376,7 +376,7 @@ Assumes:
 				return doFBLogin();
 			}
 			Login.onFB_doLogin = true;
-			Login.prepFB();
+			Login.prepFB(appId);
 			return;
 		} // ./fb
 
@@ -388,7 +388,7 @@ Assumes:
 	};
 
 	/** load the FB code - done lazy for privacy and speed */
-	Login.prepFB = function() {
+	Login.prepFB = function(appId) {
 		if (window.FB) return;
 		if (Login.preppingFB) return;
 		Login.preppingFB = true;
@@ -424,7 +424,7 @@ Assumes:
 
 	// Annoyingly -- this is likely to fail the first time round! They use a popup which gets blocked :(
 	// Possible fixes: Load FB on page load (but then FB track everyone)
-	// Use a redirect (i.e. server side login)
+	// TODO Use a redirect (i.e. server side login)
 	const doFBLogin = function() {	
 		console.warn("FB.login...");
 		FB.login(function(response) {
