@@ -583,7 +583,8 @@ Assumes:
 		if ( ! Login.isLoggedIn()) return ajaxParams;
 		dataPut(ajaxParams.data, 'app', Login.app);
 		dataPut(ajaxParams.data, 'as', Login.getId());
-		dataPut(ajaxParams.data, 'jwt', Login.getUser().jwt);
+		let jwt = Login.getUser().jwt;
+		dataPut(ajaxParams.data, 'jwt', jwt);
 		ajaxParams.xhrFields = {withCredentials: true}; // send cookies
 		dataPut(ajaxParams.data, 'withCredentials', true); // let the server know this is a with-credentials call
 		return ajaxParams;
@@ -596,6 +597,7 @@ Assumes:
 	 * @param {*} value 
 	 */
 	const dataPut = function(formData, key, value) {
+		if (value==undefined) return;
 		// HACK: is it a FormData object? then use append
 		if (typeof(formData.append)==='function') {
 			formData.append(key, value);
