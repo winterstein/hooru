@@ -187,8 +187,9 @@ Assumes:
 	var COOKIE_WEBTOKEN = COOKIE_BASE+".jwt";
 	const COOKIE_PATH = '/';
 
-	/** true if logged in, and not a temp-id */
+	/** true if logged in, and not a temp-id. NB: does not ensure a JWT token is present */
 	Login.isLoggedIn = function() { 
+		// Should we require user.jwt? But it might not be here but be present in cookies.
 		return Login.user && Login.user.service !== 'temp'? true : false;
 	}
 
