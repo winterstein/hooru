@@ -539,6 +539,7 @@ Assumes:
 		data.withCredentials = true; // let the server know this is a with-credentials call
 		data.caller = ""+document.location; // provide some extra info
 		return $.ajax({
+			dataType: "json", // not really needed but harmless
 			url: url,
 			data: data,
 			type: type || 'GET',
