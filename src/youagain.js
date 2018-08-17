@@ -45,6 +45,17 @@ Assumes:
 	}	
 	assert(Cookies && Cookies.get, "Please install js-cookie! See https://www.npmjs.com/package/js-cookie");
 
+	// Set a first party cookie? The server sets a redirect parameter, and we set a my-site cookie
+	try {
+		let url = new URL(window.location);
+		let cj = url.searchParams.get("ya_c");
+		if (cj) {
+			let c = JSON.parse(cj);
+			Cookies.set(c.name, c.value, {path: COOKIE_PATH});
+		}
+	} catch(err) {
+		console.warn("you-again url -> 1st party cookie failed", err);
+	}
 
 	var Login = {
 		/** This app, as known by you-again. You MUST set this! */
@@ -249,16 +260,6 @@ Assumes:
 				}
 			}
 		}
-		// let cuserjson = cuxid? window.localStorage.getItem(cuxid) : null;
-		// if (cuserjson) {
-		// 	try {
-		// 		var cuser = JSON.parse(cuserjson);
-		// 		if ( ! newuser) newuser = cuser;
-		// 	} catch(error) {
-		// 		console.error("login", error);
-		// 	}
-		// }
-		console.log("login coookies", cookieAliases);
 		if (cuxid && ! newuser) newuser = {xid:cuxid};
 		if ( ! newaliases) newaliases = [];
 		for(let cxid of cookieAliases) {
@@ -329,7 +330,6 @@ Assumes:
 		}
 		Cookies.set(COOKIE_UXID, Login.user.xid, {path: COOKIE_PATH});
 		// webtoken: set by the server
-		// window.localStorage.setItem(Login.user.xid, JSON.stringify(Login.user));
 		if (oldxid != newuser.xid) {
 			Login.change();
 		}
@@ -557,11 +557,6 @@ Assumes:
 			}
 		}
 		Cookies.remove(COOKIE_UXID, {path: COOKIE_PATH});
-		// // local storage		
-		// var uxid = Login.getId();
-		// if (uxid) {
-		// 	window.localStorage.removeItem(uxid);
-		// }
 		// local vars
 		Login.user = null;
 		Login.aliases = null;
