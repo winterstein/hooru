@@ -192,11 +192,9 @@ Assumes:
 		return e;
 	};
 
-	// TODO move aliases and user to local-storage 'cos they're chunky json blobs
-	var COOKIE_BASE = "you-again";
 	var COOKIE_UXID = "uxid";
-	var COOKIE_WEBTOKEN = COOKIE_BASE+".jwt";
 	const COOKIE_PATH = '/';
+	const cookieBase = () => Login.app+".jwt";
 
 	/** true if logged in, and not a temp-id. NB: does not ensure a JWT token is present */
 	Login.isLoggedIn = function() { 
@@ -240,35 +238,36 @@ Assumes:
 		let newaliases = res.cargo && res.cargo.aliases && res.cargo.aliases.slice();
 		// check the cookies (which may have changed)
 		let cuxid = Cookies.get(COOKIE_UXID);
-		// string[] XIds
-		let cookieAliases = [];
-		const cookies = Cookies.get();
-		for(let c in cookies) {
-			// workaround for server-side bug, where url-encoded name gets wrapped in quotes
-			if (c.charAt(0) === '"') {
-				c = c.slice(1, -1);
-			}
-			if (c.substr(0, COOKIE_WEBTOKEN.length)===COOKIE_WEBTOKEN) {
-				// a token? add to aliases
-				try {
-					let cxid = c.substr(COOKIE_WEBTOKEN.length+1);
-					assert(getService(cxid), cxid);
-					cookieAliases.push(cxid);
-				} catch(error) {
-					// swallow the bad cookie
-					console.error(error);
-				}
-			}
-		}
+		// // string[] XIds
+		// let cookieAliases = [];
+		// const cookies = Cookies.get();
+		// for(let c in cookies) {
+		// 	// workaround for server-side bug, where url-encoded name gets wrapped in quotes
+		// 	if (c.charAt(0) === '"') {
+		// 		c = c.slice(1, -1);
+		// 	}
+		// 	let cbase = cookieBase();
+		// 	if (c.substr(0, cbase.length)===cbase) {
+		// 		// a token? add to aliases
+		// 		try {
+		// 			let cxid = c.substr(COOKIE_WEBTOKEN.length+1);
+		// 			assert(getService(cxid), cxid);
+		// 			cookieAliases.push(cxid);
+		// 		} catch(error) {
+		// 			// swallow the bad cookie
+		// 			console.error(error);
+		// 		}
+		// 	}
+		// }
 		if (cuxid && ! newuser) newuser = {xid:cuxid};
 		if ( ! newaliases) newaliases = [];
-		for(let cxid of cookieAliases) {
-			assert(getService(cxid), cxid);				
-			var skip;
-			newaliases.forEach(na => {if (na.xid === cxid) skip = true;} );
-			if (skip) continue;
-			newaliases.push({xid:cxid});					
-		}
+		// for(let cxid of cookieAliases) {
+		// 	assert(getService(cxid), cxid);				
+		// 	var skip;
+		// 	newaliases.forEach(na => {if (na.xid === cxid) skip = true;} );
+		// 	if (skip) continue;
+		// 	newaliases.push({xid:cxid});					
+		// }
 		if (newaliases.length && ! newuser) {
 			newuser = newaliases[0];
 		}
@@ -538,6 +537,16 @@ Assumes:
 		data.app = Login.app;
 		data.withCredentials = true; // let the server know this is a with-credentials call
 		data.caller = ""+document.location; // provide some extra info
+		// add in local cookie auth
+		const cookies = Cookies.get();
+		let cbase = cookieBase();
+		for(let c in cookies) {			
+			if (c.substr(0, cbase.length)===cbase) {
+				let cv = Cookies.get(c);
+				data[c] = cv;
+			}
+		}
+
 		return $.ajax({
 			dataType: "json", // not really needed but harmless
 			url: url,
@@ -550,9 +559,10 @@ Assumes:
 	var logout2 = function() {
 		console.log('logout2 - clear stuff');
 		const cookies = Cookies.get();
-		for(let c in cookies) {
-			if (c.substr(0, COOKIE_BASE.length)===COOKIE_BASE) {
-				console.warn("remove cookie "+c);
+		let cbase = cookieBase();
+		for(let c in cookies) {			
+			if (c.substr(0, cbase.length)===cbase) {
+				console.log("remove cookie "+c);
 				Cookies.remove(c, {path: COOKIE_PATH});
 			}
 		}
