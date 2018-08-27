@@ -25,7 +25,7 @@ Assumes:
 // import {assert} from SJTest;
 
 (function(window){
-	"use strict";	
+	"use strict";		
 
 	// MUST have js-cookie and SHOULD have assert
 	if (typeof(assert)==='undefined') {
@@ -58,6 +58,8 @@ Assumes:
 	}
 
 	var Login = {
+		/** You-Again version. Should match package.json */
+		version: "0.8.0",
 		/** This app, as known by you-again. You MUST set this! */
 		app: null,
 		/** {User[]} An array of user-info objects. E.g. you might have a Twitter id and an email id.
