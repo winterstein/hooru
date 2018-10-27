@@ -117,18 +117,29 @@ Assumes:
 		return u.xid;
 	};
 
+	// /**
+	//  * Base64 url encoding 
+	//  * See https://www.jonathan-petitcolas.com/2014/11/27/creating-json-web-token-in-javascript.html
+	//  */
+	// const b64enc = function(s) {
+	// 	return btoa(s).replace(/=+$/,'').replace(/\+/g,'-').replace(/\//g,'_');
+	// };
+
 	/**
 	@return {string} A temporary unique id. This is persisted as a cookie.
 	You can use this before the user has logged in.
 	*/
 	Login.getTempId = function() {
-		var u = Login.getUser('temp');
+		let u = Login.getUser('temp');
 		if (u) return u.xid;
-		// make a temp id
-		var tempuser = {
+		// make a temp id - with an empty unsigned JWT token
+		let jwt = u.xid; // HACK - matches server-side hack
+		// b64enc(JSON.stringify({alg:"none",typ:"JWT"}))+"."+b64enc("{xid:u.xid}")+".x"
+		let tempuser = {
 			name: 'Temporary ID',
 			xid: guid()+'@temp',
-			service: 'temp'
+			service: 'temp',
+			jwt: jwt
 		};
 		setUser(tempuser);
 		// provide a webtoken too
@@ -583,13 +594,15 @@ Assumes:
 	};
 
 	/**
-	 * "sign" a packet by adding jwt token(s)
+	 * "sign" a packet by adding app, as, and jwt token(s)
+	 * 
+	 * NB: This will sign proper or temp logins.
 	 * @param {Object|FormData} ajaxParams. A params object, intended for jQuery $.ajax.
 	 * @returns the input object
 	 */
 	Login.sign = function(ajaxParams) {		
 		assert(ajaxParams && ajaxParams.data, 'youagain.js - sign: no ajaxParams.data', ajaxParams);
-		if ( ! Login.isLoggedIn()) return ajaxParams;
+		if ( ! Login.getUser()) return ajaxParams;
 		dataPut(ajaxParams.data, 'app', Login.app);
 		dataPut(ajaxParams.data, 'as', Login.getId());
 		let jwt = Login.getUser().jwt;
