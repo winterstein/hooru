@@ -132,15 +132,15 @@ Assumes:
 	Login.getTempId = function() {
 		let u = Login.getUser('temp');
 		if (u) return u.xid;
-		// make a temp id - with an empty unsigned JWT token
-		let jwt = u.xid; // HACK - matches server-side hack
-		// b64enc(JSON.stringify({alg:"none",typ:"JWT"}))+"."+b64enc("{xid:u.xid}")+".x"
+		// make a temp id
 		let tempuser = {
 			name: 'Temporary ID',
 			xid: guid()+'@temp',
 			service: 'temp',
-			jwt: jwt
 		};
+		// with an empty unsigned JWT token
+		tempuser.jwt = tempuser.xid; // HACK - matches server-side hack
+		// TODO a proper unsigned JWT token b64enc(JSON.stringify({alg:"none",typ:"JWT"}))+"."+b64enc("{xid:u.xid}")+".x"
 		setUser(tempuser);
 		// provide a webtoken too
 		Cookies.set(COOKIE_UXID, tempuser.xid, {path: COOKIE_PATH});
