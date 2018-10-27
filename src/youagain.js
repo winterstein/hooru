@@ -132,7 +132,7 @@ Assumes:
 		};
 		setUser(tempuser);
 		// provide a webtoken too
-		Cookies.set(COOKIE_WEBTOKEN+"."+tempuser.xid, tempuser.xid, {path: COOKIE_PATH});
+		Cookies.set(COOKIE_UXID, tempuser.xid, {path: COOKIE_PATH});
 		return tempuser.xid;
 	};
 
