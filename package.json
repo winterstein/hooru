@@ -1,13 +1,12 @@
 {
   "name": "you-again",
-  "version": "0.6.8",
+  "version": "0.8.4",
   "description": "You-Again Login and Authentication Manager. It will handle name/password logins, plus oauth based Twitter/Facebook/etc logins.",
   "main": "./bin/youagain.js",
   "dependencies": {
-    "eslint-plugin-import": "^2.8.0",
     "jquery": "^3.3.1",
     "js-cookie": "^2.2.0",
-    "sjtest": "^0.4.6"
+    "sjtest": "^0.4.7"
   },
   "keywords": [
     "login",
@@ -29,12 +28,12 @@
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.26.0",
-    "babili": "^0.0.12",
-    "eslint": "^3.19.0",
-    "eslint-config-airbnb": "^14.1.0",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-jsx-a11y": "^4.0.0",
-    "mocha": "^4.0.1"
+    "babili": "^0.1.4",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.10.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "mocha": "^5.0.5"
   },
   "scripts": {
     "build": "babel src --out-dir bin",

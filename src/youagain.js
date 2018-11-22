@@ -25,7 +25,7 @@ Assumes:
 // import {assert} from SJTest;
 
 (function(window){
-	"use strict";	
+	"use strict";		
 
 	// MUST have js-cookie and SHOULD have assert
 	if (typeof(assert)==='undefined') {
@@ -45,8 +45,21 @@ Assumes:
 	}	
 	assert(Cookies && Cookies.get, "Please install js-cookie! See https://www.npmjs.com/package/js-cookie");
 
+	// Set a first party cookie? The server sets a redirect parameter, and we set a my-site cookie
+	try {
+		let url = new URL(window.location);
+		let cj = url.searchParams.get("ya_c");
+		if (cj) {
+			let c = JSON.parse(cj);
+			Cookies.set(c.name, c.value, {path: COOKIE_PATH});
+		}
+	} catch(err) {
+		console.warn("you-again url -> 1st party cookie failed", err);
+	}
 
 	var Login = {
+		/** You-Again version. Should match package.json */
+		version: "0.8.0",
 		/** This app, as known by you-again. You MUST set this! */
 		app: null,
 		/** {User[]} An array of user-info objects. E.g. you might have a Twitter id and an email id.
@@ -59,7 +72,7 @@ Assumes:
 		/** with auth() by Twitter -- where to redirect to on success. Defaults to this page. */
 		redirectOnLogin: window.location,
 		/** The server url. Change this if you use a different login server. */
-		ENDPOINT: 'https://youagain.winterwell.com/youagain.json',
+		ENDPOINT: 'https://youagain.good-loop.com/youagain.json',
 
 		PERMISSIONS: {
 			/** Get an ID to identify who this is, but no more. */
@@ -112,22 +125,33 @@ Assumes:
 		return u.xid;
 	};
 
+	// /**
+	//  * Base64 url encoding 
+	//  * See https://www.jonathan-petitcolas.com/2014/11/27/creating-json-web-token-in-javascript.html
+	//  */
+	// const b64enc = function(s) {
+	// 	return btoa(s).replace(/=+$/,'').replace(/\+/g,'-').replace(/\//g,'_');
+	// };
+
 	/**
 	@return {string} A temporary unique id. This is persisted as a cookie.
 	You can use this before the user has logged in.
 	*/
 	Login.getTempId = function() {
-		var u = Login.getUser('temp');
+		let u = Login.getUser('temp');
 		if (u) return u.xid;
 		// make a temp id
-		var tempuser = {
+		let tempuser = {
 			name: 'Temporary ID',
 			xid: guid()+'@temp',
-			service: 'temp'
+			service: 'temp',
 		};
+		// with an empty unsigned JWT token
+		tempuser.jwt = tempuser.xid; // HACK - matches server-side hack
+		// TODO a proper unsigned JWT token b64enc(JSON.stringify({alg:"none",typ:"JWT"}))+"."+b64enc("{xid:u.xid}")+".x"
 		setUser(tempuser);
 		// provide a webtoken too
-		Cookies.set(COOKIE_WEBTOKEN+"."+tempuser.xid, tempuser.xid, {path: COOKIE_PATH});
+		Cookies.set(COOKIE_UXID, tempuser.xid, {path: COOKIE_PATH});
 		return tempuser.xid;
 	};
 
@@ -189,14 +213,13 @@ Assumes:
 		return e;
 	};
 
-	// TODO move aliases and user to local-storage 'cos they're chunky json blobs
-	var COOKIE_BASE = "you-again";
 	var COOKIE_UXID = "uxid";
-	var COOKIE_WEBTOKEN = COOKIE_BASE+".jwt";
 	const COOKIE_PATH = '/';
+	const cookieBase = () => Login.app+".jwt";
 
-	/** true if logged in, and not a temp-id */
+	/** true if logged in, and not a temp-id. NB: does not ensure a JWT token is present */
 	Login.isLoggedIn = function() { 
+		// Should we require user.jwt? But it might not be here but be present in cookies.
 		return Login.user && Login.user.service !== 'temp'? true : false;
 	}
 
@@ -236,45 +259,36 @@ Assumes:
 		let newaliases = res.cargo && res.cargo.aliases && res.cargo.aliases.slice();
 		// check the cookies (which may have changed)
 		let cuxid = Cookies.get(COOKIE_UXID);
-		let cuserjson = cuxid? window.localStorage.getItem(cuxid) : null;
-		// string[] XIds
-		let cookieAliases = [];
-		const cookies = Cookies.get();
-		for(let c in cookies) {
-			// workaround for server-side bug, where url-encoded name gets wrapped in quotes
-			if (c.charAt(0) === '"') {
-				c = c.slice(1, -1);
-			}
-			if (c.substr(0, COOKIE_WEBTOKEN.length)===COOKIE_WEBTOKEN) {
-				// a token? add to aliases
-				try {
-					let cxid = c.substr(COOKIE_WEBTOKEN.length+1);
-					assert(getService(cxid), cxid);
-					cookieAliases.push(cxid);
-				} catch(error) {
-					// swallow the bad cookie
-					console.error(error);
-				}
-			}
-		}
-		if (cuserjson) {
-			try {
-				var cuser = JSON.parse(cuserjson);
-				if ( ! newuser) newuser = cuser;
-			} catch(error) {
-				console.error("login", error);
-			}
-		}
-		console.log("login coookies", cookieAliases, cuser);
+		// // string[] XIds
+		// let cookieAliases = [];
+		// const cookies = Cookies.get();
+		// for(let c in cookies) {
+		// 	// workaround for server-side bug, where url-encoded name gets wrapped in quotes
+		// 	if (c.charAt(0) === '"') {
+		// 		c = c.slice(1, -1);
+		// 	}
+		// 	let cbase = cookieBase();
+		// 	if (c.substr(0, cbase.length)===cbase) {
+		// 		// a token? add to aliases
+		// 		try {
+		// 			let cxid = c.substr(COOKIE_WEBTOKEN.length+1);
+		// 			assert(getService(cxid), cxid);
+		// 			cookieAliases.push(cxid);
+		// 		} catch(error) {
+		// 			// swallow the bad cookie
+		// 			console.error(error);
+		// 		}
+		// 	}
+		// }
 		if (cuxid && ! newuser) newuser = {xid:cuxid};
 		if ( ! newaliases) newaliases = [];
-		for(let cxid of cookieAliases) {
-			assert(getService(cxid), cxid);				
-			var skip;
-			newaliases.forEach(na => {if (na.xid === cxid) skip = true;} );
-			if (skip) continue;
-			newaliases.push({xid:cxid});					
-		}
+		// for(let cxid of cookieAliases) {
+		// 	assert(getService(cxid), cxid);				
+		// 	var skip;
+		// 	newaliases.forEach(na => {if (na.xid === cxid) skip = true;} );
+		// 	if (skip) continue;
+		// 	newaliases.push({xid:cxid});					
+		// }
 		if (newaliases.length && ! newuser) {
 			newuser = newaliases[0];
 		}
@@ -336,7 +350,6 @@ Assumes:
 		}
 		Cookies.set(COOKIE_UXID, Login.user.xid, {path: COOKIE_PATH});
 		// webtoken: set by the server
-		window.localStorage.setItem(Login.user.xid, JSON.stringify(Login.user));
 		if (oldxid != newuser.xid) {
 			Login.change();
 		}
@@ -383,31 +396,8 @@ Assumes:
 			if (window.FB) {
 				return doFBLogin();
 			}
-			window.fbAsyncInit = function() {
-				FB.init({
-					appId            : appId,
-					autoLogAppEvents : false,
-					xfbml            : false,
-					version          : 'v2.9',
-					status           : true // auto-check login
-				});
-				// FB.AppEvents.logPageView();
-				FB.getLoginStatus(function(response) {
-					console.warn("FB.getLoginStatus", response);
-					if (response.status === 'connected') {
-						doFBLogin_connected(response);
-					} else {
-						doFBLogin();
-					}
-				}); // ./login status
-			};
-			(function(d, s, id){
-				let fjs = d.getElementsByTagName(s)[0];
-				if (d.getElementById(id)) return;
-				let js = d.createElement(s); js.id = id;
-				js.src = "//connect.facebook.net/en_US/sdk.js";
-				fjs.parentNode.insertBefore(js, fjs);
-			}(document, 'script', 'facebook-jssdk'));
+			Login.onFB_doLogin = true;
+			Login.prepFB(appId);
 			return;
 		} // ./fb
 
@@ -418,9 +408,44 @@ Assumes:
 			+"&link="+(Login.redirectOnLogin || '');
 	};
 
+	/** load the FB code - done lazy for privacy and speed */
+	Login.prepFB = function(appId) {
+		if (window.FB) return;
+		if (Login.preppingFB) return;
+		Login.preppingFB = true;
+		window.fbAsyncInit = function() {
+			FB.init({
+				appId            : appId,
+				autoLogAppEvents : false,
+				xfbml            : false,
+				version          : 'v2.9',
+				status           : true // auto-check login
+			});
+			// FB.AppEvents.logPageView();
+			FB.getLoginStatus(function(response) {
+				console.warn("FB.getLoginStatus", response);
+				if (response.status === 'connected') {
+					doFBLogin_connected(response);
+				} else {
+					if (Login.onFB_doLogin) {
+						doFBLogin();
+					}
+				}
+			}); // ./login status
+		};
+		(function(d, s, id){
+			let fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) return;
+			let js = d.createElement(s); js.id = id;
+			js.src = "//connect.facebook.net/en_US/sdk.js";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));
+	}; // ./prepFB
+
+
 	// Annoyingly -- this is likely to fail the first time round! They use a popup which gets blocked :(
 	// Possible fixes: Load FB on page load (but then FB track everyone)
-	// Use a redirect (i.e. server side login)
+	// TODO Use a redirect (i.e. server side login)
 	const doFBLogin = function() {	
 		console.warn("FB.login...");
 		FB.login(function(response) {
@@ -533,7 +558,18 @@ Assumes:
 		data.app = Login.app;
 		data.withCredentials = true; // let the server know this is a with-credentials call
 		data.caller = ""+document.location; // provide some extra info
+		// add in local cookie auth
+		const cookies = Cookies.get();
+		let cbase = cookieBase();
+		for(let c in cookies) {			
+			if (c.substr(0, cbase.length)===cbase) {
+				let cv = Cookies.get(c);
+				data[c] = cv;
+			}
+		}
+
 		return $.ajax({
+			dataType: "json", // not really needed but harmless
 			url: url,
 			data: data,
 			type: type || 'GET',
@@ -544,16 +580,19 @@ Assumes:
 	var logout2 = function() {
 		console.log('logout2 - clear stuff');
 		const cookies = Cookies.get();
-		for(let c in cookies) {
-			if (c.substr(0, COOKIE_BASE.length)===COOKIE_BASE) {
-				console.warn("remove cookie "+c);
+		let cbase = cookieBase();
+		for(let c in cookies) {			
+			if (c.substr(0, cbase.length)===cbase) {
+				console.log("remove cookie "+c);
 				Cookies.remove(c, {path: COOKIE_PATH});
 			}
 		}
 		Cookies.remove(COOKIE_UXID, {path: COOKIE_PATH});
+		// local vars
 		Login.user = null;
 		Login.aliases = null;
-		Login.error = null;
+		Login.error = null;		
+		// notify any listeners
 		Login.change();
 	};
 
@@ -563,16 +602,19 @@ Assumes:
 	};
 
 	/**
-	 * "sign" a packet by adding jwt token(s)
+	 * "sign" a packet by adding app, as, and jwt token(s)
+	 * 
+	 * NB: This will sign proper or temp logins.
 	 * @param {Object|FormData} ajaxParams. A params object, intended for jQuery $.ajax.
 	 * @returns the input object
 	 */
 	Login.sign = function(ajaxParams) {		
 		assert(ajaxParams && ajaxParams.data, 'youagain.js - sign: no ajaxParams.data', ajaxParams);
-		if ( ! Login.isLoggedIn()) return ajaxParams;
+		if ( ! Login.getUser()) return ajaxParams;
 		dataPut(ajaxParams.data, 'app', Login.app);
 		dataPut(ajaxParams.data, 'as', Login.getId());
-		dataPut(ajaxParams.data, 'jwt', Login.getUser().jwt);
+		let jwt = Login.getUser().jwt;
+		dataPut(ajaxParams.data, 'jwt', jwt);
 		ajaxParams.xhrFields = {withCredentials: true}; // send cookies
 		dataPut(ajaxParams.data, 'withCredentials', true); // let the server know this is a with-credentials call
 		return ajaxParams;
@@ -585,6 +627,7 @@ Assumes:
 	 * @param {*} value 
 	 */
 	const dataPut = function(formData, key, value) {
+		if (value==undefined) return;
 		// HACK: is it a FormData object? then use append
 		if (typeof(formData.append)==='function') {
 			formData.append(key, value);
@@ -598,16 +641,21 @@ Assumes:
 	 * 
 	 * Security: The browser must have a token for puppetXId for this request to succeed. 
 	 * 
-	 * @param puppetXId {String} Normally Login.getId()
-	 * @param bothWays {?boolean} If true, this relation is bi-directional: you claim the two ids are the same person. */
-	Login.shareLogin = function(puppetXId, personXId, bothWays) {
+	 * @param puppetXId {String} Normally Login.getId() But actually this can be any string! This is the base method for shareThing()
+	 * TODO we should probably refactor that just for clearer naming.
+	 * @param personXId {String} the user who it is shared with
+	 * @param bothWays {?boolean} If true, this relation is bi-directional: you claim the two ids are the same person.
+	 * @param message {?String} Optional message to email to personXId
+	 */
+	Login.shareLogin = function(puppetXId, personXId, bothWays, message) {
 		assert(isString(puppetXId), 'youagain.js shareThing() - Not a String ', puppetXId);
 		assert(isString(personXId), 'youagain.js shareThing() - Not an XId String ', personXId);
 		var request = aget(Login.ENDPOINT, {
 			'action':'share',
 			'entity': puppetXId,
 			'shareWith': personXId,
-			'equiv': bothWays
+			'equiv': bothWays,
+			'message': message 
 		});
 		request = request.then(setStateFromServerResponse);
 		return request;
@@ -622,7 +670,7 @@ Assumes:
 			'action':'delete-share',
 			'entity': thingId,
 			'shareWith': personXId
-		}, 'DELETE');
+		}); // NB: jQuery turns delete into options, no idea why, which upsets the server, 'DELETE');
 		request = request.then(setStateFromServerResponse);
 		return request;
 	};
@@ -632,10 +680,11 @@ Assumes:
 	 * The share comes from the current user.
 	 * @param thingId {String} ID for the thing you want to share. 
 	 * This ID is app specific. E.g. "/myfolder/mything"
+	 * @param message {?String} Optional message to email to personXId
 	 */
-	Login.shareThing = function(thingId, personXId) {
+	Login.shareThing = function(thingId, personXId, message) {
 		// actually they are the same call, but bothWays only applies for shareLogin
-		return Login.shareLogin(thingId, personXId);
+		return Login.shareLogin(thingId, personXId, null, message);
 	}
 
 	/**

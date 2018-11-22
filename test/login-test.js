@@ -37,7 +37,7 @@ describe('Login', function() {
 		it('should sign params', function(done) {
 			var lp = Login.login(TEST_EMAIL,'1234');
 			lp.then(function() {
-				let params = {url:'https://youagain.winterwell.com/youagain.json', data:{action:'verify', app:Login.app}};
+				let params = {url:'https://youagain.good-loop.com/youagain.json', data:{action:'verify', app:Login.app}};
 				Login.sign(params);
 				$.ajax(params)
 				.then(res => {
