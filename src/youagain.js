@@ -70,6 +70,14 @@ Assumes:
 		}
 	};
 
+	// MyLoop app fix
+	// Android does not allow you to redirect to a file on Android local storage
+	// Get around this by redirecting to production myloop
+	// Not very nice, but it does work for now
+	if( ('' + Login.redirectOnLogin).slice(0, 7) === "file://" ) {
+		Login.redirectOnLogin = "https://my.good-loop.com";
+	}
+
 	// Export the Login module
 	window.Login = Login;
 	if (typeof module !== 'undefined') {
