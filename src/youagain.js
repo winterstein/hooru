@@ -705,6 +705,7 @@ Assumes:
 	/**
 	 * List things shared with user.
 	 * You are advised to cache this!
+	 * @returns {Promise<Share[]>}
 	 */
 	Login.getSharedWith = function() {
 		var request = aget(Login.ENDPOINT, {
@@ -717,6 +718,7 @@ Assumes:
 	/**
 	 * List things shared by the user.
 	 * You are advised to cache this!
+	 * @returns {Promise<Share[]>}
 	 */
 	Login.getSharedBy = function() {
 		var request = aget(Login.ENDPOINT, {
@@ -731,6 +733,7 @@ Assumes:
 	 * Check whether the user can access this thing. 
 	 * Returns a share object if there is one, otherwise returns without error but with success:false 
 	 * You are advised to cache this!
+	 * @returns {Promise<Share>}
 	 */
 	Login.checkShare = function(thingId) {
 		assert(isString(thingId), 'youagain.js checkShare() - Not a String ',thingId);
@@ -745,6 +748,7 @@ Assumes:
 	/**
 	 * List the shares for an object (the user must have access to the thing).
 	 * You are advised to cache this!
+	 * @returns {Promise<Share[]>}
 	 */
 	Login.getShareList = function(thingId) {
 		assert(isString(thingId), 'youagain.js getShareList() - Not a String ',thingId);
