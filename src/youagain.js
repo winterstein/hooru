@@ -606,6 +606,7 @@ Assumes:
 	 * 
 	 * NB: This will sign proper or temp logins.
 	 * @param {Object|FormData} ajaxParams. A params object, intended for jQuery $.ajax.
+	 * ajaxParams.data.{app, as, jwt, withCredentials} are set, as is ajaxParams.withCredentials.
 	 * @returns the input object
 	 */
 	Login.sign = function(ajaxParams) {		
