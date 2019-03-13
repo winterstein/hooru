@@ -28,9 +28,9 @@ Assumes:
 	"use strict";		
 
 	// MUST have js-cookie and SHOULD have assert
-	if (typeof(assert)==='undefined') {
+	if (typeof(assert) === 'undefined') {
 		console.warn("Login: creating assert. Recommended: import SJTest");
-		assert = function(betrue, msg) {
+		window.assert = function(betrue, msg) {
 			if ( ! betrue) throw new Error("assert-failed: "+msg); 
 		};
 	}
