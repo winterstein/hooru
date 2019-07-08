@@ -59,7 +59,7 @@ Assumes:
 
 	var Login = {
 		/** You-Again version. Should match package.json */
-		version: "0.8.0",
+		version: "0.8.5",
 		/** This app, as known by you-again. You MUST set this! */
 		app: null,
 		/** {User[]} An array of user-info objects. E.g. you might have a Twitter id and an email id.
@@ -329,7 +329,7 @@ Assumes:
 		var oldxid = Login.user && Login.user.xid;
 		if (Login.user && Login.user.xid === newuser.xid) {
 			// keep old info... but newuser overrides
-			newuser = $.extend({}, Login.user, newuser);
+			newuser = Object.assign({}, Login.user, newuser);
 			// TODO extend aliases
 		}
 		// set user
@@ -567,7 +567,10 @@ Assumes:
 				data[c] = cv;
 			}
 		}
-
+		if ( ! $ || ! $.ajax) {
+			console.error("YouAgain requires jQuery or other $.ajax");l
+			return Promise.reject("no $");
+		}
 		return $.ajax({
 			dataType: "json", // not really needed but harmless
 			url: url,
