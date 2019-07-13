@@ -57,7 +57,7 @@ Assumes:
 		console.warn("you-again url -> 1st party cookie failed", err);
 	}
 
-	var Login = {
+	const Login = {
 		/** You-Again version. Should match package.json */
 		version: "0.8.5",
 		/** This app, as known by you-again. You MUST set this! */
