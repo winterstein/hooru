@@ -44,6 +44,16 @@ Assumes:
 		// import Cookies from 'js-cookie'; Avoid ES6 for now
 	}	
 	assert(Cookies && Cookies.get, "Please install js-cookie! See https://www.npmjs.com/package/js-cookie");
+	/**
+	 * make cookies widely available across the site
+	 */
+	const COOKIE_PATH = '/';
+	/**
+	 * Convenience to set cookie with path, SameSite=None, secure=true
+	 * @param {!String} key 
+	 * @param {String} val 
+	 */
+	const setCookie = (key, val) => Cookies.set(key, val, {path: COOKIE_PATH, sameSite:'None', secure:true});
 
 	// Set a first party cookie? The server sets a redirect parameter, and we set a my-site cookie
 	try {
@@ -51,7 +61,7 @@ Assumes:
 		let cj = url.searchParams.get("ya_c");
 		if (cj) {
 			let c = JSON.parse(cj);
-			Cookies.set(c.name, c.value, {path: COOKIE_PATH});
+			setCookie(c.name, c.value);
 		}
 	} catch(err) {
 		console.warn("you-again url -> 1st party cookie failed", err);
@@ -59,7 +69,7 @@ Assumes:
 
 	const Login = {
 		/** You-Again version. Should match package.json */
-		version: "0.8.5",
+		version: "0.8.6",
 		/** This app, as known by you-again. You MUST set this! */
 		app: null,
 		/** {User[]} An array of user-info objects. E.g. you might have a Twitter id and an email id.
@@ -151,7 +161,7 @@ Assumes:
 		// TODO a proper unsigned JWT token b64enc(JSON.stringify({alg:"none",typ:"JWT"}))+"."+b64enc("{xid:u.xid}")+".x"
 		setUser(tempuser);
 		// provide a webtoken too
-		Cookies.set(COOKIE_UXID, tempuser.xid, {path: COOKIE_PATH});
+		setCookie(COOKIE_UXID, tempuser.xid);		
 		return tempuser.xid;
 	};
 
@@ -213,8 +223,7 @@ Assumes:
 		return e;
 	};
 
-	var COOKIE_UXID = "uxid";
-	const COOKIE_PATH = '/';
+	var COOKIE_UXID = "uxid";	
 	const cookieBase = () => Login.app+".jwt";
 
 	/** true if logged in, and not a temp-id. NB: does not ensure a JWT token is present */
@@ -348,7 +357,7 @@ Assumes:
 			// aliases = just the user
 			Login.aliases = [newuser];
 		}
-		Cookies.set(COOKIE_UXID, Login.user.xid, {path: COOKIE_PATH});
+		setCookie(COOKIE_UXID, Login.user.xid);
 		// webtoken: set by the server
 		if (oldxid != newuser.xid) {
 			Login.change();
