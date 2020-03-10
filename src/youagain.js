@@ -306,10 +306,10 @@ Assumes:
 			return res;
 		}
 		// prefer a non-temp user
-		if (getService(newuser.xid) === 'temp') {
+		if (getService(newuser.xid) === 'temp' || getService(newuser.xid) === 'trk') {
 			for(let i=0; i<newaliases.length; i++) {
 				const alias = newaliases[i];
-				if (getService(alias.xid)==='temp') continue;
+				if (getService(alias.xid)==='temp'  || getService(alias.xid) === 'trk') continue;
 				newuser = alias;
 				break;
 			}
@@ -357,7 +357,9 @@ Assumes:
 			// aliases = just the user
 			Login.aliases = [newuser];
 		}
+		// cookies
 		setCookie(COOKIE_UXID, Login.user.xid);
+		if (Login.user.jwt) setCookie(COOKIE_JWT, Login.user.jwt);
 		// webtoken: set by the server
 		if (oldxid != newuser.xid) {
 			Login.change();
