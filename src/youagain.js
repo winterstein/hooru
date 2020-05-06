@@ -80,7 +80,7 @@ Assumes:
 		/** {id, text} Error message, or null */
 		error: null,
 		/** with auth() by Twitter -- where to redirect to on success. Defaults to this page. */
-		redirectOnLogin: window.location,
+		redirectOnLogin: null,
 		/** The server url. Change this if you use a different login server. */
 		ENDPOINT: 'https://youagain.good-loop.com/youagain.json',
 
@@ -93,13 +93,14 @@ Assumes:
 		}
 	};
 
-	// MyLoop app fix
-	// Android does not allow you to redirect to a file on Android local storage
-	// Get around this by redirecting to production myloop
-	// Not very nice, but it does work for now
-	if( ('' + Login.redirectOnLogin).slice(0, 7) === "file://" ) {
-		Login.redirectOnLogin = "https://my.good-loop.com";
-	}
+	// // MyLoop app fix
+	// // Android does not allow you to redirect to a file on Android local storage
+	// // Get around this by redirecting to production myloop
+	// // Not very nice, but it does work for now
+	// // ?? WHy is this not in the MyLoop code?
+	// if( ('' + Login.redirectOnLogin).slice(0, 7) === "file://" ) {
+	// 	Login.redirectOnLogin = "https://my.good-loop.com";
+	// }
 
 	// Export the Login module
 	window.Login = Login;
@@ -236,8 +237,8 @@ Assumes:
 	@return: promise */
 	Login.verify = function() {
 		console.log("start login...");
-		var auth = aget(Login.ENDPOINT, {action:'verify'});
-		return auth.then(function(res) {
+		let pVerify = aget(Login.ENDPOINT, {action:'verify'});
+		return pVerify.then(function(res) {
 			if ( ! res || ! res.success) {
 				logout2();
 			} else {
@@ -385,12 +386,12 @@ Assumes:
 		// clear any cookies
 		logout2();
 		// now try to login
-		var auth = aget(Login.ENDPOINT, {action:'login', person:person, password:password});
-		auth = auth.then(setStateFromServerResponse)
+		let pLogin = aget(Login.ENDPOINT, {action:'login', person:person, password:password});
+		pLogin = pLogin.then(setStateFromServerResponse)
 				.fail(function(res) {
 					Login.error = {id: res.statusCode, text: res.statusText};	
 				});
-		return auth;
+		return pLogin;
 	};
 
 	/**
@@ -416,7 +417,7 @@ Assumes:
 		window.location = Login.ENDPOINT+"?action=get-auth&app="+escape(Login.app)
 			+"&appId="+escape(appId)+"&service="+service
 			+(permissions? "&permissions="+escape(permissions) : '')
-			+"&link="+(Login.redirectOnLogin || '');
+			+"&link="+escape(Login.redirectOnLogin || window.location);
 	};
 
 	/** load the FB code - done lazy for privacy and speed */
