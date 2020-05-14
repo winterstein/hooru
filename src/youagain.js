@@ -224,7 +224,8 @@ Assumes:
 		return e;
 	};
 
-	var COOKIE_UXID = "uxid";	
+	const COOKIE_UXID = "uxid";	
+	const COOKIE_JWT = "jwt";
 	const cookieBase = () => Login.app+".jwt";
 
 	/** true if logged in, and not a temp-id. NB: does not ensure a JWT token is present */
@@ -256,12 +257,17 @@ Assumes:
 		});
 	};
 
+	const setLoginError = err => {
+		if ( ! err) return;
+		console.error("#login.setError", err);
+		Login.error = err;
+	};
+
 	var setStateFromServerResponse = function(res) {
-		console.log('setStateFromServerResponse', res);
+		console.log('setStateFromServerResponse', res);		
 		if (res.errors && res.errors.length) {
 			// stash the error for showing to the user
-			console.error("#login.state", res.errors[0]);
-			Login.error = res.errors[0];
+			setLoginError(res.errors[0]);
 			return res;
 		}
 		let newuser = res.cargo && res.cargo.user;
@@ -269,36 +275,8 @@ Assumes:
 		let newaliases = res.cargo && res.cargo.aliases && res.cargo.aliases.slice();
 		// check the cookies (which may have changed)
 		let cuxid = Cookies.get(COOKIE_UXID);
-		// // string[] XIds
-		// let cookieAliases = [];
-		// const cookies = Cookies.get();
-		// for(let c in cookies) {
-		// 	// workaround for server-side bug, where url-encoded name gets wrapped in quotes
-		// 	if (c.charAt(0) === '"') {
-		// 		c = c.slice(1, -1);
-		// 	}
-		// 	let cbase = cookieBase();
-		// 	if (c.substr(0, cbase.length)===cbase) {
-		// 		// a token? add to aliases
-		// 		try {
-		// 			let cxid = c.substr(COOKIE_WEBTOKEN.length+1);
-		// 			assert(getService(cxid), cxid);
-		// 			cookieAliases.push(cxid);
-		// 		} catch(error) {
-		// 			// swallow the bad cookie
-		// 			console.error(error);
-		// 		}
-		// 	}
-		// }
 		if (cuxid && ! newuser) newuser = {xid:cuxid};
 		if ( ! newaliases) newaliases = [];
-		// for(let cxid of cookieAliases) {
-		// 	assert(getService(cxid), cxid);				
-		// 	var skip;
-		// 	newaliases.forEach(na => {if (na.xid === cxid) skip = true;} );
-		// 	if (skip) continue;
-		// 	newaliases.push({xid:cxid});					
-		// }
 		if (newaliases.length && ! newuser) {
 			newuser = newaliases[0];
 		}
@@ -380,7 +358,7 @@ Assumes:
 	Login.login = function(person, password) {
 		if ( ! password) {
 			console.log("#login: no password for "+person);
-			Login.error = {id:'missing-password', text:'Missing input: Password'};
+			setLoginError({id:'missing-password', text:'Missing input: Password'});
 			return Promise.resolve(null); // fail
 		}
 		// clear any cookies
